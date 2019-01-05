@@ -13,7 +13,7 @@
          Node js Socket io Chat Application
       </h1>
       <div class="row" style="margin-top: 70px;">
-         <div class="col-md-4"></div>
+         <div class="col-md-4"><div id="users"></div></div>
          <div class="col-md-6">
             <div id="chatArea">
             </div>
@@ -36,15 +36,36 @@
          var form = jQuery('#myForm');
          var txt = jQuery('#txt');
          var chatArea = jQuery('#chatArea');
+         socket.on('start', function(data){
+            var my_id = data.message;
+            console.log(my_id);
+            socket.on(my_id,function(data){
+               console.log(data);
+            });
+            //chatArea.append('<div class="well">'+data.message+'</div>');
+         });
+
 
          form.submit(function(e) {
             e.preventDefault();
+
             socket.emit('sending message', txt.val());
             txt.val('');
          });
 
          socket.on('new message', function(data){
-            chatArea.append('<div class="well">'+data.message+'</div>');
+            chatArea.append('<div class="well">'+data.socket+': '+data.message+'</div>');
+         });
+
+         socket.on('all sockets', function(data){
+            var usersArea = jQuery('#users');
+            console.log(data.message);
+            var array = data.message;
+            usersArea.html('');
+            array.forEach(function(msg){
+               usersArea.append('<div class="well">'+msg+'</div>');
+            });
+           
          });
       });
    </script>
