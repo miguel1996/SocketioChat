@@ -9,6 +9,7 @@
 
 
         socket = io.connect();
+        var loginForm = $('#loginForm');
         var form = jQuery('#myForm');
         var txt = jQuery('#txt');
         var chatArea = jQuery('#chatArea');
@@ -16,6 +17,12 @@
         //when a new user enters or an existing onde exits
         socket.on('update', function (data) {
             handleNewUser(data);
+        });
+
+        //when someone clicks login
+        loginForm.submit(function (e) {
+            e.preventDefault();
+            login();
         });
 
         //when someone send a message
