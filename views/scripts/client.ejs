@@ -1,0 +1,70 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script>
+    var socket;
+    jQuery(document).ready(function () {
+        $("#chat").css('display', 'none');
+        $("#login_form").css('display', 'block');
+
+
+        socket = io.connect();
+        var form = jQuery('#myForm');
+        var txt = jQuery('#txt');
+        var chatArea = jQuery('#chatArea');
+
+
+        socket.on('update', function (data) {
+            handleNewUser(data);
+        });
+
+        // socket.on('start', function (data) {
+        //     var my_id = data.message;
+        //     console.log(my_id);
+        //     socket.on(my_id, function (data) {
+        //         console.log(data);
+        //     });
+        //     //chatArea.append('<div class="well">'+data.message+'</div>');
+        // });
+
+
+        form.submit(function (e) {
+            e.preventDefault();
+
+            socket.emit('sending message', txt.val());
+            txt.val('');
+        });
+
+        socket.on('new message', function (data) {
+            chatArea.append('<div class="well">' + data.socket + ': ' + data.message + '</div>');
+        });
+
+        // socket.on('all sockets', function (data) {
+        //     var usersArea = jQuery('#users');
+        //     console.log(data.message);
+        //     var array = data.message;
+        //     usersArea.html('');
+        //     array.forEach(function (msg) {
+        //         usersArea.append('<div class="well">' + msg + '</div>');
+        //     });
+
+        // });
+    });
+
+    function login() {
+        $("#chat").css('display', 'block');
+        $("#login_form").css('display', 'none');
+        socket.emit('join', $("#user_name").val());
+    }
+
+    function handleNewUser(data) {
+        var usersArea = jQuery('#users');
+        var conns = data.connections;
+        usersArea.html('');
+
+        for (var key in conns) {
+            usersArea.append('<div class="well">' + conns[key] + '</div>');
+        }
+        $('#chatArea').append('<div class="well">' + data.message.welcome + '</div>');
+    }
+
+</script>

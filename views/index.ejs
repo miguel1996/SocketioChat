@@ -1,59 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-   <title>Node.js Socket.io Chat Application</title>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Node.js Socket.io Chat Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+   
+    <%include ./scripts/client %>
+
 </head>
+
 <body>
-   <div class="container">
-      <h1 class="jumbotron">
-         Node js Socket io Chat Application
-      </h1>
-      <%include ./partials/chat %>
-   </div>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-   <script>
-      jQuery(document).ready(function() {
-         var socket = io.connect();
-         var form = jQuery('#myForm');
-         var txt = jQuery('#txt');
-         var chatArea = jQuery('#chatArea');
-         socket.on('start', function(data){
-            var my_id = data.message;
-            console.log(my_id);
-            socket.on(my_id,function(data){
-               console.log(data);
-            });
-            //chatArea.append('<div class="well">'+data.message+'</div>');
-         });
-
-
-         form.submit(function(e) {
-            e.preventDefault();
-
-            socket.emit('sending message', txt.val());
-            txt.val('');
-         });
-
-         socket.on('new message', function(data){
-            chatArea.append('<div class="well">'+data.socket+': '+data.message+'</div>');
-         });
-
-         socket.on('all sockets', function(data){
-            var usersArea = jQuery('#users');
-            console.log(data.message);
-            var array = data.message;
-            usersArea.html('');
-            array.forEach(function(msg){
-               usersArea.append('<div class="well">'+msg+'</div>');
-            });
-           
-         });
-      });
-   </script>
+   
+    <div class="container">
+        <h1 class="jumbotron">
+            Node js Socket io Chat Application
+        </h1>
+        <%include ./partials/login %>
+        <%include ./partials/chat %>
+    </div>
 </body>
+
 </html>

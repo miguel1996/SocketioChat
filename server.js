@@ -13,32 +13,47 @@ server.listen(PORT);
 console.log('Server is running');
 
 const users = [];
-const connections = [];
+const connections = {};
 io.sockets.on('connection',(socket) => {
-   connections.push(socket);
-   users.push(socket.id);
-   console.log(' %s sockets is connected', connections.length);
-   socket.emit('start',{message:socket.id});
+   
+   socket.on('join',function(user_name){
+     connections[socket.id] = user_name;
+     //users.push([socket.id,user_name]);
+     console.log('join event user:'+user_name);
+     var message ={welcome:user_name+" has joined the chat room"};
+     io.emit('update',{message,connections});
+ });
 
-   io.sockets.emit('all sockets',{message: users});
+   // connections.push(socket);
+   // users.push(socket.id);
+   // console.log(' %s sockets is connected', connections.length);
+   // socket.emit('start',{message:socket.id});
 
-   socket.on('disconnect', () => {
-      console.log("disconect "+socket.id);
-      users.splice(users.indexOf(socket.id), 1);
-      connections.splice(connections.indexOf(socket), 1);
-   });
+   // io.sockets.emit('all sockets',{message: users});
+
+   
 
    socket.on('sending message', (message) => {
-      console.log('Message is received :', message);
-      io.sockets.emit('new message', {message: message,socket:socket.id});
+      var user = connections[socket.id];
+      console.log(user+" : "+message);
+      io.sockets.emit('new message', {message: message,socket:user});
 
    });
 
-   socket.on('private',(data) =>{
-      if(data.target=123)
-      socket.emit('123',info);
-      if(data.target=321)
-      socket.emit('321',info);
+   // socket.on('private',(data) =>{
+   //    if(data.target=123)
+   //    socket.emit('123',info);
+   //    if(data.target=321)
+   //    socket.emit('321',info);
+   // });
+   socket.on('disconnect', () => {
+      var user = connections[socket.id];
+      if(user){
+      console.log(user+"disconect "+socket.id);
+      delete connections[socket.id];
+      var message ={welcome:user+" has disconected from the chat room"};
+      io.emit('update',{message,connections});
+      }
    });
 });
 
