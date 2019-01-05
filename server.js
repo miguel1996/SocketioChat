@@ -7,9 +7,7 @@ const User = require("./model/User");
 const Message = require("./model/Message");
 var mongoConfigs = require("./model/mongoConfigs");
 mongoConfigs.connect(() => {
-   app.listen(8080, function () {
-      console.log("listening on port 8080");
-   });
+   console.log("Connected to the mongo server");
 });
 
 const app = express();
@@ -24,19 +22,27 @@ console.log('Server is running on port ' + PORT);
 const connections = {};
 io.sockets.on('connection', (socket) => {
 
-   socket.on('join', function (user_name) {
+   socket.on('join', function (data) {
+      var user_name = data.user_name;
+      var password = data.password;
       //checks if a user already exists and inserts in db if not
-      addUserIfNotExists(user_name);
-      // User.getAll((data)=>{console.log(data);});
-
-      //related the socket.id to the user logedin
-      connections[socket.id] = user_name;
-      console.log(user_name+' joined');
-      //created a message for all to see
-      var message = { welcome: user_name + " has joined the chat room" };
-      io.emit('update', { message, connections });
+      autenticateUser(user_name,password,(authentication)=>{
+         if(authentication){
+                 //related the socket.id to the user logedin
+            connections[socket.id] = user_name;
+            console.log(user_name+' joined');
+            //created a message for all to see
+            var message = { welcome: user_name + " has joined the chat room" };
+            io.emit('update', { message, connections });
+      
+            //rooms will also be used for the private messaging
+            //https://socket.io/docs/rooms-and-namespaces/#default-room
+            socket.join(user_name);//defining a room with the name of the socket and joining that socket to the room
+            io.to(user_name).emit('auth',{ message: 'sucess', socket: user_name });
+         }          
+      });    
    });
-
+   
    //when someone sends a message the server will store it and broadcast it to everyone
    socket.on('sending message', (message) => {
       var user = connections[socket.id];
@@ -46,13 +52,6 @@ io.sockets.on('connection', (socket) => {
       console.log(user + " : " + message);
       io.sockets.emit('new message', { message: message, socket: user });
    });
-
-   // socket.on('private',(data) =>{
-   //    if(data.target=123)
-   //    socket.emit('123',info);
-   //    if(data.target=321)
-   //    socket.emit('321',info);
-   // });
 
    socket.on('disconnect', () => {
       var user = connections[socket.id];
@@ -69,10 +68,33 @@ app.get('/', (req, res) => {
    res.render('index');
 });
 
-function addUserIfNotExists(user_name) {
+
+function autenticateUser(user_name,password,callback) {
+   User.exists(user_name, (result) => {
+      //se nao existe entao adiciona
+      if (!result) {
+         addUserIfNotExists(user_name,password);
+         callback(true);//true means that the authentications ended sucessfully(this means that a user has logged on)
+      }
+      //se ja existe um user na bd entao verifica a pass
+      else{
+         User.auth(user_name,password,(result)=>{
+            //se autenticação foi bem sucedida
+            if(result){
+               callback(true);
+            }else{
+               console.log('atenticação falhou: '+user_name+" pw: "+password);
+               callback(false);
+            }
+         });
+      }
+   }); 
+}
+
+function addUserIfNotExists(user_name,password) {
    User.exists(user_name, (result) => {
       if (!result) {
-         User.insertUser(user_name, '123');
+         User.insertUser(user_name, password);
          console.log('created '+user_name);
       }
    }); 

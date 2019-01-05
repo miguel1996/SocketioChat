@@ -9,7 +9,6 @@ module.exports = {
     connect: function (callback) {
         MongoClient.connect(url, function (err, client) {
             if (!err) {
-                console.log("Conncected to the server on url "+url);
                 db = client.db(dbName);
                 callback();
             }

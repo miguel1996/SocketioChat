@@ -31,6 +31,10 @@
 
             socket.emit('sending message', txt.val());
             txt.val('');
+
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $("#send_message_button").offset().top
+            }, 1);
         });
 
         //a new message on the general chat
@@ -38,13 +42,24 @@
             chatArea.append('<div class="well">' + data.socket + ': ' + data.message + '</div>');
         });
 
+        socket.on('private',function(data){
+            chatArea.append('<div class="well">TEST:' + data.socket + ': ' + data.message + '</div>');
+        });
+
+        socket.on('auth',function(data){
+            $("#chat").css('display', 'block');
+        $("#login_form").css('display', 'none');
+        });
+
+
     });
 
     //when the user clicks login
     function login() {
-        $("#chat").css('display', 'block');
-        $("#login_form").css('display', 'none');
-        socket.emit('join', $("#user_name").val());
+        let user_name = $("#user_name").val();
+        let password = $("#password").val();
+        socket.emit('join', {user_name,password});
+       
     }
 
     //handles when a new user enters or an existing onde exits
