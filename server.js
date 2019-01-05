@@ -24,15 +24,6 @@ io.sockets.on('connection',(socket) => {
      io.emit('update',{message,connections});
  });
 
-   // connections.push(socket);
-   // users.push(socket.id);
-   // console.log(' %s sockets is connected', connections.length);
-   // socket.emit('start',{message:socket.id});
-
-   // io.sockets.emit('all sockets',{message: users});
-
-   
-
    socket.on('sending message', (message) => {
       var user = connections[socket.id];
       console.log(user+" : "+message);
@@ -46,6 +37,7 @@ io.sockets.on('connection',(socket) => {
    //    if(data.target=321)
    //    socket.emit('321',info);
    // });
+
    socket.on('disconnect', () => {
       var user = connections[socket.id];
       if(user){
@@ -59,5 +51,4 @@ io.sockets.on('connection',(socket) => {
 
 app.get('/', (req, res) => {
    res.render('index');
-   // res.sendFile(__dirname + '/index.html');
 });
