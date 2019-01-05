@@ -1,10 +1,13 @@
 import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
+import ejs from 'ejs';
 
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
+app.set('view engine','ejs');
+
 const PORT = 3000;
 server.listen(PORT);
 console.log('Server is running');
@@ -40,5 +43,6 @@ io.sockets.on('connection',(socket) => {
 });
 
 app.get('/', (req, res) => {
-   res.sendFile(__dirname + '/index.html');
+   res.render('index');
+   // res.sendFile(__dirname + '/index.html');
 });
