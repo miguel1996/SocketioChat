@@ -3,6 +3,7 @@
 <script>
     var socket;
     jQuery(document).ready(function () {
+        //in the beggining the chat is hidden and a login prompt is shown
         $("#chat").css('display', 'none');
         $("#login_form").css('display', 'block');
 
@@ -12,11 +13,12 @@
         var txt = jQuery('#txt');
         var chatArea = jQuery('#chatArea');
 
-
+        //when a new user enters or an existing onde exits
         socket.on('update', function (data) {
             handleNewUser(data);
         });
 
+        //when someone send a message
         form.submit(function (e) {
             e.preventDefault();
 
@@ -24,18 +26,21 @@
             txt.val('');
         });
 
+        //a new message on the general chat
         socket.on('new message', function (data) {
             chatArea.append('<div class="well">' + data.socket + ': ' + data.message + '</div>');
         });
-        
+
     });
 
+    //when the user clicks login
     function login() {
         $("#chat").css('display', 'block');
         $("#login_form").css('display', 'none');
         socket.emit('join', $("#user_name").val());
     }
 
+    //handles when a new user enters or an existing onde exits
     function handleNewUser(data) {
         var usersArea = jQuery('#users');
         var conns = data.connections;
