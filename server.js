@@ -47,13 +47,26 @@ io.sockets.on('connection', (socket) => {
             io.emit('update', { message, connections });
          }
          else {
-            io.to(user_name).emit('auth', { message: '' });
+            io.to(user_name).emit('auth', { message: 'fail' });
          }
       });
    });
 
    socket.on('requesting last messages',(data)=>{
-console.log(data);
+      let user_name =  connections[socket.id];
+      if(data.target === 'general')
+      { 
+         Message.getPublic((lastMessages) => {
+            //emits a private event to tell the client the result of the authentication   
+            io.to(user_name).emit('last public messages', { message: 'sucess', lastMessages });
+         });
+      }else{
+         //sends the last messages between the requester and his target
+         Message.getPrivate(data.target,user_name,(lastMessages)=>{
+            io.to(user_name).emit('last public messages', { message: 'sucess', lastMessages });
+         })
+      }
+      
    });
 
    //when someone sends a message the server will store it and broadcast it to everyone

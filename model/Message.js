@@ -26,6 +26,22 @@ function getPublic(callback){
         }
     });
 }
+
+function getPrivate(target,sender,callback){
+    var db= mongoConfigs.getDB();
+    // db.collection('private_messages').find({$and:[{$or:[{user_id:target},{user_id:sender}]},{$or:[{target_user:target},{target_user:sender}]}]}).sort({_id:-1}).limit(5).toArray((err,result)=>{
+    db.collection('private_messages').find({$or:[{user_name:sender,target_user:target},{user_name:target,target_user:sender}]}).sort({_id:-1}).limit(5).toArray((err,result)=>{
+        if(err){
+            console.log(err);
+            return err;
+        }else{
+            //console.log(result);
+            callback(result);
+           // return result;
+        }
+    });
+}
+
 function insertPrivateMessage(details,user_id,user_name,target_user){
     var db= mongoConfigs.getDB();
     var now = Date.now();
@@ -40,5 +56,5 @@ function insertPrivateMessage(details,user_id,user_name,target_user){
 }
 
 module.exports = {
-    insertMessage, getPublic,insertPrivateMessage
+    insertMessage, getPublic,insertPrivateMessage,getPrivate
 };

@@ -59,6 +59,11 @@
             }
         });
 
+        socket.on('last public messages', function (data) {
+            if (data.message === 'sucess') {
+                insertLastMessages(data.lastMessages);
+            }
+        });
 
 
         $('#users').click(function(event){
