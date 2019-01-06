@@ -28,8 +28,7 @@
         //when someone send a message
         form.submit(function (e) {
             e.preventDefault();
-
-            socket.emit('sending message', txt.val());
+            socket.emit('sending message', {message:txt.val(),target:$('#chatTarget').attr('value')});
             txt.val('');
 
             $([document.documentElement, document.body]).animate({
@@ -39,12 +38,15 @@
 
         //a new message on the general chat
         socket.on('new message', function (data) {
-            writeInChatArea(data.socket, data.message, Date.now());
-            //chatArea.append('<div class="well">' + data.socket + ': ' + data.message + '</div>');
+            if($("#chatTarget").attr('value') === 'general')
+            {
+                writeInChatArea(data.socket, data.message, Date.now());
+            }
         });
 
         socket.on('private', function (data) {
-            chatArea.append('<div class="well">TEST:' + data.socket + ': ' + data.message + '</div>');
+            console.log(data);
+            // chatArea.append('<div class="well">TEST:' + data.socket + ': ' + data.message + '</div>');
         });
 
         socket.on('auth', function (data) {
@@ -58,6 +60,17 @@
         });
 
 
+
+        $('#users').click(function(event){
+            //when the user changes the user_name to talk to, onyl the one he selected will be in bold
+            $('#users').find('*').css('font-weight','normal');
+            $(event.target).css('font-weight','bold');
+            clearChatArea();
+            //the chatTarget var is now updated to correspond to the user in bold
+            $('#chatTarget').attr('value',$(event.target).attr('value'));
+            //console.log('clicked='+$(event.target).attr('value'));
+            socket.emit('requesting last messages', {target:$('#chatTarget').attr('value')});
+        });
     });
 
     //when the user clicks login
@@ -68,27 +81,24 @@
 
     }
 
-    //handles when a new user enters or an existing onde exits
+    //handles when a new user enters or an existing one exits
     function handleNewUser(data) {
         var usersArea = jQuery('#users');
         var conns = data.connections;
         usersArea.html('');
-
+        //font weight ta mal
+        usersArea.append('<div class="well" value="general" id="general">General chat</div>');
         for (var key in conns) {
-            usersArea.append('<div class="well">' + conns[key] + '</div>');
+            usersArea.append('<div class="well" value="'+conns[key]+'" id="'+conns[key]+'">' + conns[key] + '</div>');
         }
+        let chatTargetVal = $("#chatTarget").attr('value');
+        $("#"+chatTargetVal).css('font-weight','bold');
         $('#chatArea').append('<div class="well">' + data.message.welcome + '</div>');
     }
 
     function insertLastMessages(lastMessages) {
         lastMessages.reverse();
         for (let index = 0; index < lastMessages.length; index++) {
-            // let date = new Date(lastMessages[index].timestamp);
-            // let hour = date.getHours();
-            // let minutes = date.getMinutes();
-            // let seconds = date.getSeconds();
-            // let dateFormatted = hour + ":" + minutes + ":" + seconds;
-            // $('#chatArea').append('<div class="well">' + dateFormatted + ' ' + lastMessages[index].user_name + ': ' + lastMessages[index].details + '</div>');
             writeInChatArea(lastMessages[index].user_name,lastMessages[index].details,lastMessages[index].timestamp);
         }
     }
@@ -101,6 +111,10 @@
         let seconds = date.getSeconds()+'s';
         let dateFormatted = hour + minutes + seconds;
         $('#chatArea').append('<div class="well">' + dateFormatted + ' ' + user + ': ' + message + '</div>');
+    }
+
+    function clearChatArea(){
+        $('#chatArea').html('');
     }
 
 </script>

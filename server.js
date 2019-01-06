@@ -52,14 +52,16 @@ io.sockets.on('connection', (socket) => {
       });
    });
 
+   socket.on('requesting last messages',(data)=>{
+console.log(data);
+   });
+
    //when someone sends a message the server will store it and broadcast it to everyone
-   socket.on('sending message', (message) => {
+   socket.on('sending message', (data) => {
       var user = connections[socket.id];
-      User.getId(user, (id) => {
-         Message.insertMessage(message, id, user);//inserts a message in db with the id of the user that sent it
-      });
-      console.log(user + " : " + message);
-      io.sockets.emit('new message', { message: message, socket: user });
+      addMessageToDatabase(user,data);//adds the message to the correct place in db(to a private or public collection)
+      emitMessage(user,data,io);
+     
    });
 
    socket.on('disconnect', () => {
@@ -107,4 +109,32 @@ function addUserIfNotExists(user_name, password) {
          console.log('created ' + user_name);
       }
    });
+}
+
+function addMessageToDatabase(user_name,data){
+   if(data.target === "general"){
+   User.getId(user_name, (id) => {
+      Message.insertMessage(data.message, id, user_name);//inserts a message in db with the id of the user that sent it
+   });
+   }
+   else{
+      User.getId(user_name, (id) => {
+         Message.insertPrivateMessage(data.message, id, user_name, data.target);//inserts a message in db with the id of the user that sent it
+      });
+   }
+}
+function emitMessage(user,data,io){
+   if(data.target === 'general')
+   {
+      console.log('GENERAL-'+user + " : " + data.message);
+      io.sockets.emit('new message', { message: data.message, socket: user });
+   }
+   else{
+      console.log('PRIVATE-'+user+': '+data.message+" TO "+data.target);
+      let sender_socket_id = Object.keys(connections).find(key=>connections[key] === user);
+      io.sockets.connected[sender_socket_id].emit('private',{message:data.message,target:data.target,sender:user});
+      let target_socket_id = Object.keys(connections).find(key=>connections[key] === data.target);
+      io.sockets.connected[target_socket_id].emit('private',{message:data.message,target:data.target,sender:user});
+   }
+  
 }

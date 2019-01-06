@@ -26,7 +26,19 @@ function getPublic(callback){
         }
     });
 }
+function insertPrivateMessage(details,user_id,user_name,target_user){
+    var db= mongoConfigs.getDB();
+    var now = Date.now();
+    db.collection('private_messages').insertOne({details,user_id,user_name,timestamp:now,target_user},function(err,result){
+        if(err){
+            console.log(err);
+            return err;
+        }else{
+            return result;
+        }
+    });
+}
 
 module.exports = {
-    insertMessage, getPublic,
+    insertMessage, getPublic,insertPrivateMessage
 };
