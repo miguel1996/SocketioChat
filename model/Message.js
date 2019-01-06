@@ -1,8 +1,9 @@
 var mongoConfigs = require("./mongoConfigs");
 
-function insertMessage(details,user_id){
+function insertMessage(details,user_id,user_name){
     var db= mongoConfigs.getDB();
-    db.collection('public_messages').insertOne({details,user_id},function(err,result){
+    var now = Date.now();
+    db.collection('public_messages').insertOne({details,user_id,user_name,timestamp:now},function(err,result){
         if(err){
             console.log(err);
             return err;
@@ -14,7 +15,7 @@ function insertMessage(details,user_id){
 
 function getPublic(callback){
     var db= mongoConfigs.getDB();
-    db.collection('public_messages').find({}).sort({_id:-1}).limit(10).toArray((err,result)=>{
+    db.collection('public_messages').find({}).sort({_id:-1}).limit(5).toArray((err,result)=>{
         if(err){
             console.log(err);
             return err;

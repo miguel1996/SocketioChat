@@ -51,6 +51,7 @@
             {
                 $("#chat").css('display', 'block');
                 $("#login_form").css('display', 'none');
+                insertLastMessages(data.lastMessages);
             }else{
                 alert("wrong password");
             }      
@@ -77,6 +78,18 @@
             usersArea.append('<div class="well">' + conns[key] + '</div>');
         }
         $('#chatArea').append('<div class="well">' + data.message.welcome + '</div>');
+    }
+
+    function insertLastMessages(lastMessages){
+        lastMessages.reverse();
+        for (let index = 0; index < lastMessages.length; index++) {
+            let date = new Date(lastMessages[index].timestamp);
+            let hour = date.getHours();
+            let minutes = date.getMinutes();
+            let seconds = date.getSeconds();
+            let dateFormatted = hour+":"+minutes+":"+seconds;
+            $('#chatArea').append('<div class="well">'+dateFormatted+' ' + lastMessages[index].user_name +': '+lastMessages[index].details+ '</div>');          
+        }
     }
 
 </script>

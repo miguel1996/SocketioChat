@@ -35,9 +35,14 @@ io.sockets.on('connection', (socket) => {
             //related the socket.id to the user logedin
             connections[socket.id] = user_name;
             console.log(user_name + ' joined');
-            //emits a private event to tell the client the result of the authentication
-            io.to(user_name).emit('auth', { message: 'sucess' });
-            //created a message for all to see
+
+            //sends the last 10 public msgs to a user that just entered
+            Message.getPublic((lastMessages) => {
+               //emits a private event to tell the client the result of the authentication   
+               io.to(user_name).emit('auth', { message: 'sucess', lastMessages });
+            });
+
+            //created a message for all to see that there are new users in the chat
             var message = { welcome: user_name + " has joined the chat room" };
             io.emit('update', { message, connections });
          }
@@ -51,7 +56,7 @@ io.sockets.on('connection', (socket) => {
    socket.on('sending message', (message) => {
       var user = connections[socket.id];
       User.getId(user, (id) => {
-         Message.insertMessage(message, id);//inserts a message in db with the id of the user that sent it
+         Message.insertMessage(message, id, user);//inserts a message in db with the id of the user that sent it
       });
       console.log(user + " : " + message);
       io.sockets.emit('new message', { message: message, socket: user });

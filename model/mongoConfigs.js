@@ -2,6 +2,7 @@ const mongo = require("mongodb");
 var MongoClient = mongo.MongoClient;
 var db;
 
+
 const url = 'mongodb://localhost:27017';
 const dbName = 'grupo6';
 
@@ -19,5 +20,8 @@ module.exports = {
     },
     getDB: function () {
         return db;
+    },
+    getMongo: function (){
+        return mongo;
     }
 }
