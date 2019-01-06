@@ -45,7 +45,10 @@
         });
 
         socket.on('private', function (data) {
-            console.log(data);
+            if(data.target === $('#chatTarget').attr('value') || data.sender === $('#chatTarget').attr('value'))
+            {
+                writeInChatArea(data.sender, data.message, Date.now());
+            }
             // chatArea.append('<div class="well">TEST:' + data.socket + ': ' + data.message + '</div>');
         });
 
