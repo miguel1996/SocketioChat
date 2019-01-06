@@ -39,12 +39,12 @@ io.sockets.on('connection', (socket) => {
             //sends the last 10 public msgs to a user that just entered
             Message.getPublic((lastMessages) => {
                //emits a private event to tell the client the result of the authentication   
-               io.to(user_name).emit('auth', { message: 'sucess', lastMessages });
+               io.to(user_name).emit('auth', { message: 'sucess', lastMessages,user_name });
             });
 
             //created a message for all to see that there are new users in the chat
             var message = { welcome: user_name + " has joined the chat room" };
-            io.emit('update', { message, connections });
+            io.emit('update', { message, connections});
          }
          else {
             io.to(user_name).emit('auth', { message: 'fail' });

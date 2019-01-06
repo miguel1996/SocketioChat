@@ -53,6 +53,7 @@
             if (data.message === 'sucess') {
                 $("#chat").css('display', 'block');
                 $("#login_form").css('display', 'none');
+                $("#main_header").append(" "+data.user_name);
                 insertLastMessages(data.lastMessages);
             } else {
                 alert(data.message);
