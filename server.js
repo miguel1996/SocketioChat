@@ -47,7 +47,7 @@ io.sockets.on('connection', (socket) => {
             io.emit('update', { message, connections });
          }
          else {
-            io.to(user_name).emit('auth', { message: 'fail' });
+            io.to(user_name).emit('auth', { message: '' });
          }
       });
    });
