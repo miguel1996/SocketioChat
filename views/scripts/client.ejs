@@ -47,8 +47,13 @@
         });
 
         socket.on('auth',function(data){
-            $("#chat").css('display', 'block');
-        $("#login_form").css('display', 'none');
+            if(data.message === 'sucess')
+            {
+                $("#chat").css('display', 'block');
+                $("#login_form").css('display', 'none');
+            }else{
+                alert("wrong password");
+            }      
         });
 
 

@@ -25,24 +25,28 @@ io.sockets.on('connection', (socket) => {
    socket.on('join', function (data) {
       var user_name = data.user_name;
       var password = data.password;
+
+      //rooms will also be used for the private messaging
+      //https://socket.io/docs/rooms-and-namespaces/#default-room
+      socket.join(user_name);//defining a room with the name of the socket and joining that socket to the room
       //checks if a user already exists and inserts in db if not
-      autenticateUser(user_name,password,(authentication)=>{
-         if(authentication){
-                 //related the socket.id to the user logedin
+      autenticateUser(user_name, password, (authentication) => {
+         if (authentication) {
+            //related the socket.id to the user logedin
             connections[socket.id] = user_name;
-            console.log(user_name+' joined');
+            console.log(user_name + ' joined');
+            //emits a private event to tell the client the result of the authentication
+            io.to(user_name).emit('auth', { message: 'sucess' });
             //created a message for all to see
             var message = { welcome: user_name + " has joined the chat room" };
             io.emit('update', { message, connections });
-      
-            //rooms will also be used for the private messaging
-            //https://socket.io/docs/rooms-and-namespaces/#default-room
-            socket.join(user_name);//defining a room with the name of the socket and joining that socket to the room
-            io.to(user_name).emit('auth',{ message: 'sucess', socket: user_name });
-         }          
-      });    
+         }
+         else {
+            io.to(user_name).emit('auth', { message: 'fail' });
+         }
+      });
    });
-   
+
    //when someone sends a message the server will store it and broadcast it to everyone
    socket.on('sending message', (message) => {
       var user = connections[socket.id];
@@ -69,33 +73,33 @@ app.get('/', (req, res) => {
 });
 
 
-function autenticateUser(user_name,password,callback) {
+function autenticateUser(user_name, password, callback) {
    User.exists(user_name, (result) => {
       //se nao existe entao adiciona
       if (!result) {
-         addUserIfNotExists(user_name,password);
+         addUserIfNotExists(user_name, password);
          callback(true);//true means that the authentications ended sucessfully(this means that a user has logged on)
       }
       //se ja existe um user na bd entao verifica a pass
-      else{
-         User.auth(user_name,password,(result)=>{
+      else {
+         User.auth(user_name, password, (result) => {
             //se autenticação foi bem sucedida
-            if(result){
+            if (result) {
                callback(true);
-            }else{
-               console.log('atenticação falhou: '+user_name+" pw: "+password);
+            } else {
+               console.log('atenticação falhou: ' + user_name + " pw: " + password);
                callback(false);
             }
          });
       }
-   }); 
+   });
 }
 
-function addUserIfNotExists(user_name,password) {
+function addUserIfNotExists(user_name, password) {
    User.exists(user_name, (result) => {
       if (!result) {
          User.insertUser(user_name, password);
-         console.log('created '+user_name);
+         console.log('created ' + user_name);
       }
-   }); 
+   });
 }
