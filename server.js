@@ -47,7 +47,7 @@ io.sockets.on('connection', (socket) => {
             });
 
             //created a message for all to see that there are new users in the chat
-            var message = { welcome: user_name + " has joined the chat room" };
+            var message = { welcome: "<span class='highlight'>" + user_name + "</span> has joined the chat room!" };
             io.emit('update', { message, connections});
          }
          else {
@@ -89,7 +89,7 @@ io.sockets.on('connection', (socket) => {
       if (user) {
          console.log(user + " disconected with socketid " + socket.id);
          delete connections[socket.id];
-         var message = { welcome: user + " has disconected from the chat room" };
+         var message = { welcome: "<span class='highlight'>"+user + "</span> has disconected from the chat room" };
          io.emit('update', { message, connections });
       }
    });
