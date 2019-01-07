@@ -1,4 +1,5 @@
 var mongoConfigs = require("./mongoConfigs");
+var ObjectId = require('mongodb').ObjectID;
 
 function insertUser(name,password){
     var db= mongoConfigs.getDB();
@@ -38,6 +39,19 @@ function getId(user_name,callback){
     });
 }
 
+function getOne(id,callback){
+    var db= mongoConfigs.getDB();
+    var o_id = new ObjectId(id);
+    db.collection('users').find({'_id': o_id}).toArray((err,result)=>{
+        if(err){
+            console.log(err);
+            return err;
+        }else{
+            callback(result[0]);
+        }
+    });
+}
+
 function exists(name,callback){
     var db= mongoConfigs.getDB();
     db.collection('users').find({'name':name}).toArray((err,result)=>{
@@ -63,5 +77,5 @@ function auth(name,password,callback){
 }
 
 module.exports = {
-    insertUser, getAll,exists,getId,auth
+    insertUser, getAll,exists,getId,auth,getOne
 };
