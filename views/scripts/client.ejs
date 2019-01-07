@@ -64,6 +64,21 @@
                 $("#login_form").css('display', 'none');
                 $("#main_header").html("Welcome home, " + data.user_name + "!");
                 insertLastMessages(data.lastMessages);
+                var emojis = ["&#x1F600", "&#x1F604", "&#x1F34A", "&#x1F344", "&#x1F37F", "&#x1F363", "&#x1F370", "&#x1F355", "&#x1F354", "&#x1F35F", "&#x1F6C0", "&#x1F48E", "&#x1F5FA", "&#x23F0", "&#x1F579", "&#x1F4DA", "&#x1F431", "&#x1F42A", "&#x1F439", "&#x1F424"];
+                var list = $("#list"); 
+                var element = 0;
+                var rows = 4;
+                var columns = 5;
+                for(j = 0; j < rows; j++){
+                    list.append("<tr>");
+                    for(i = 0; i < columns; i++){
+                        
+                        list.append("<td class='emoji' id='"+emojis[element]+"'>"+emojis[element]+"</td>");
+                        element++;
+                    }
+                    list.append("</tr>");
+                }
+                
             } else {
                 // alert(data.message);
                 $('#failed-login').css('display', 'inline');
@@ -95,6 +110,11 @@
             $('#chatTarget').attr('value',$(event.target).attr('value'));
             //console.log('clicked='+$(event.target).attr('value'));
             socket.emit('requesting last messages', {target:$('#chatTarget').attr('value')});
+        });
+
+        $('#list').click(function(event){
+            console.log($(event.target).attr('id'));
+            $("#txt").val($("#txt").val() + $(event.target).attr('id')).focus();
         });
 
     });
