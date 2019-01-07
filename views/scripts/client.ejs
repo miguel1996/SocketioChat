@@ -62,10 +62,20 @@
             if (data.message === 'sucess') {
                 $("#chat").css('display', 'block');
                 $("#login_form").css('display', 'none');
-                $("#main_header").append(" "+data.user_name);
+                $("#main_header").append(data.user_name);
                 insertLastMessages(data.lastMessages);
             } else {
-                alert(data.message);
+                // alert(data.message);
+                $('#failed-login').css('display', 'inline');
+                console.log(data.message);
+                var app = new Vue({
+                    el: '#failed-login',
+
+                    data: {
+                        msg: 'The password is incorrect! Please try again!',
+                        test: data.message
+                    }
+                });
             }
         });
 
@@ -93,8 +103,29 @@
     function login() {
         let user_name = $("#user_name").val();
         let password = $("#password").val();
-        socket.emit('join', { user_name, password });
+        socket.emit('join', { user_name, password});
 
+    }
+
+    function getHashColor(string){
+        // console.log(string);
+        var hash="";
+        string = string.toUpperCase();
+
+        for(i = 0; i < 5; i = i + 2){
+
+            var value = (string.charCodeAt(i%(string.length))+string.charCodeAt((i+1)%(string.length))-130)*255/50;
+            // console.log("before:"+value);
+            value = Math.round(value);
+            value = value.toString(16);
+            if(value.length < 2){
+                value = "0" + value;
+            }
+            // console.log(value);
+            hash = hash + value.toString(16);
+        }
+        // console.log(hash);
+        return hash;
     }
 
     //handles when a new user enters or an existing one exits
@@ -104,12 +135,19 @@
         usersArea.html('');
         //font weight ta mal
         usersArea.append('<div class="well" value="general" id="general">General chat</div>');
+        
         for (var key in conns) {
-            usersArea.append('<div class="well" value="'+conns[key]+'" id="'+conns[key]+'">' + conns[key] + '</div>');
+            color = getHashColor(conns[key]);
+            // console.log(complement);
+            usersArea.append('<div class="well" style="background-color:#'+color+';" value="'+conns[key]+'" id="'+conns[key]+'">' + conns[key] + '</div>');
+            
+
         }
         let chatTargetVal = $("#chatTarget").attr('value');
         $("#"+chatTargetVal).css('font-weight','bold');
         $('#chatArea').append('<div class="well">' + data.message.welcome + '</div>');
+        
+        // return conns[last];
     }
 
     function insertLastMessages(lastMessages) {
