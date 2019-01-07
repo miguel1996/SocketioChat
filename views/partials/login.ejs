@@ -1,15 +1,32 @@
 <div id="login_form" class="container">
+
     <form id="loginForm">    
         <div class="form-group">
-                    Username: <input id="user_name" type="text">
-                 </div>
-                 <div class="form-group">
-                        Password: <input id="password" type="password">
-                     </div>
-                
-                 <div class="form-group">
-                    <button type="submit" class="btn btn-success">Login</button>
-                 </div>
-    </form>
-    
-</div>
+            Username: <input id="user_name" type="text">
+        </div>
+        <div class="form-group">
+            Password: <input id="password" type="password">
+        </div>
+        <div v-if="i !== 0" id="failed-login">
+            <span style="color:red;">{{msg}}</span>
+            <div id="test"></div>
+        </div>
+        <script>
+                // var please = data.title;
+                // $("#test").html("<p>we</p>");
+                var i = 1;
+                var app = new Vue({
+                    el: '#failed-login',
+
+                    data: {
+                        msg: "The password is incorrect! Please, try again!"
+                    }
+                });
+            </script>
+            <br>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Login</button>
+            </div>
+        </form>
+
+    </div>
