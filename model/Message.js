@@ -1,5 +1,6 @@
 var mongoConfigs = require("./mongoConfigs");
 
+
 function insertMessage(details,user_id,user_name){
     var db= mongoConfigs.getDB();
     var now = Date.now();
@@ -58,3 +59,6 @@ function insertPrivateMessage(details,user_id,user_name,target_user){
 module.exports = {
     insertMessage, getPublic,insertPrivateMessage,getPrivate
 };
+
+
+
