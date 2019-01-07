@@ -8,7 +8,7 @@
 ```
 git clone <this repository>
 ```
-*install node.js and a have a mongodb server running
+* install node.js and a have a mongodb server running
 * open the folder and run on the terminal
 ```
 npm install
