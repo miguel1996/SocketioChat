@@ -33,7 +33,8 @@ io.sockets.on('connection', (socket) => {
       //socket.join(user_name);//defining a room with the name of the socket and joining that socket to the room
       //checks if a user already exists and inserts in db if not
       autenticateUser(user_name, password, (authentication) => {
-         if (authentication) {
+        console.log(authentication);
+         if (authentication.result) {
             //related the socket.id to the user logedin
             connections[socket.id] = user_name;
             console.log(user_name + ' joined');
@@ -50,7 +51,7 @@ io.sockets.on('connection', (socket) => {
             io.emit('update', { message, connections});
          }
          else {
-            io.sockets.connected[socket.id].emit('auth', { message: 'fail' });
+            io.sockets.connected[socket.id].emit('auth', { message: authentication.reason });
             //io.to(user_name).emit('auth', { message: 'fail' });
          }
       });
@@ -104,23 +105,32 @@ function autenticateUser(user_name, password, callback) {
       //se nao existe entao adiciona
       if (!result) {
          if(user_name === ''){
-            callback(false);
+            callback({ result: false, reason: 'Empty username' });
          }else{
          addUserIfNotExists(user_name, password);
-         callback(true);//true means that the authentications ended sucessfully(this means that a user has logged on)
+         callback({ result: true, reason: '' });//true means that the authentications ended sucessfully(this means that a user has logged on)
          }
       }
       //se ja existe um user na bd entao verifica a pass
       else {
-         User.auth(user_name, password, (result) => {
-            //se autenticação foi bem sucedida
-            if (result) {
-               callback(true);
-            } else {
-               console.log('atenticação falhou: ' + user_name + " pw: " + password);
-               callback(false);
-            }
-         });
+         let target_socket_id = Object.keys(connections).find(key => connections[key] === user_name);
+       
+         if (target_socket_id ){
+            
+            callback({ result: false, reason:'User allready online'});
+
+         }else{
+            
+            User.auth(user_name, password, (result) => {
+               //se autenticação foi bem sucedida
+               if (result) {
+                  callback({ result: true, reason: "" });
+               } else {
+                  console.log('atenticação falhou: ' + user_name + " pw: " + password);
+                  callback({ result: false, reason: "Wrong Password!" });
+               }
+            });
+         }
       }
    });
 }
