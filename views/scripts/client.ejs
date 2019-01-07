@@ -1,0 +1,129 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script>
+    var socket;
+    jQuery(document).ready(function () {
+        //in the beggining the chat is hidden and a login prompt is shown
+        $("#chat").css('display', 'none');
+        $("#login_form").css('display', 'block');
+
+
+        socket = io.connect();
+        var loginForm = $('#loginForm');
+        var form = jQuery('#myForm');
+        var txt = jQuery('#txt');
+        var chatArea = jQuery('#chatArea');
+
+        //when a new user enters or an existing onde exits
+        socket.on('update', function (data) {
+            handleNewUser(data);
+        });
+
+        //when someone clicks login
+        loginForm.submit(function (e) {
+            e.preventDefault();
+            login();
+        });
+
+        //when someone send a message
+        form.submit(function (e) {
+            e.preventDefault();
+            socket.emit('sending message', {message:txt.val(),target:$('#chatTarget').attr('value')});
+            txt.val('');
+
+            $([document.documentElement, document.body]).animate({
+                scrollTop: $("#send_message_button").offset().top
+            }, 1);
+        });
+
+        //a new message on the general chat
+        socket.on('new message', function (data) {
+            if($("#chatTarget").attr('value') === 'general')
+            {
+                writeInChatArea(data.socket, data.message, Date.now());
+            }
+        });
+
+        socket.on('private', function (data) {
+            if(data.target === $('#chatTarget').attr('value') || data.sender === $('#chatTarget').attr('value'))
+            {
+                writeInChatArea(data.sender, data.message, Date.now());
+            }
+            // chatArea.append('<div class="well">TEST:' + data.socket + ': ' + data.message + '</div>');
+        });
+
+        socket.on('auth', function (data) {
+            if (data.message === 'sucess') {
+                $("#chat").css('display', 'block');
+                $("#login_form").css('display', 'none');
+                $("#main_header").append(" "+data.user_name);
+                insertLastMessages(data.lastMessages);
+            } else {
+                alert(data.message);
+            }
+        });
+
+        socket.on('last public messages', function (data) {
+            if (data.message === 'sucess') {
+                insertLastMessages(data.lastMessages);
+            }
+        });
+
+
+        $('#users').click(function(event){
+            //when the user changes the user_name to talk to, onyl the one he selected will be in bold
+            $('#users').find('*').css('font-weight','normal');
+            $(event.target).css('font-weight','bold');
+            clearChatArea();
+            //the chatTarget var is now updated to correspond to the user in bold
+            $('#chatTarget').attr('value',$(event.target).attr('value'));
+            //console.log('clicked='+$(event.target).attr('value'));
+            socket.emit('requesting last messages', {target:$('#chatTarget').attr('value')});
+        });
+    });
+
+    //when the user clicks login
+    function login() {
+        let user_name = $("#user_name").val();
+        let password = $("#password").val();
+        socket.emit('join', { user_name, password });
+
+    }
+
+    //handles when a new user enters or an existing one exits
+    function handleNewUser(data) {
+        var usersArea = jQuery('#users');
+        var conns = data.connections;
+        usersArea.html('');
+        //font weight ta mal
+        usersArea.append('<div class="well" value="general" id="general">General chat</div>');
+        for (var key in conns) {
+            usersArea.append('<div class="well" value="'+conns[key]+'" id="'+conns[key]+'">' + conns[key] + '</div>');
+        }
+        let chatTargetVal = $("#chatTarget").attr('value');
+        $("#"+chatTargetVal).css('font-weight','bold');
+        $('#chatArea').append('<div class="well">' + data.message.welcome + '</div>');
+    }
+
+    function insertLastMessages(lastMessages) {
+        lastMessages.reverse();
+        for (let index = 0; index < lastMessages.length; index++) {
+            writeInChatArea(lastMessages[index].user_name,lastMessages[index].details,lastMessages[index].timestamp);
+        }
+    }
+
+    function writeInChatArea(user, message, tmsp)
+    {
+        let date = new Date(tmsp);
+        let hour = date.getHours()+'h';
+        let minutes = date.getMinutes()+'m';
+        let seconds = date.getSeconds()+'s';
+        let dateFormatted = hour + minutes + seconds;
+        $('#chatArea').append('<div class="well">' + dateFormatted + ' ' + user + ': ' + message + '</div>');
+    }
+
+    function clearChatArea(){
+        $('#chatArea').html('');
+    }
+
+</script>
