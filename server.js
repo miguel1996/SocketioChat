@@ -13,6 +13,8 @@ mongoConfigs.connect(() => {
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
+app.use(express.static(__dirname + '\\views\\scripts'));
+console.log(__dirname + '\\views\\scripts');
 app.set('view engine', 'ejs');
 
 const PORT = 3000;
