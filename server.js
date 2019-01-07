@@ -28,7 +28,7 @@ io.sockets.on('connection', (socket) => {
 
       //rooms will also be used for the private messaging
       //https://socket.io/docs/rooms-and-namespaces/#default-room
-      socket.join(user_name);//defining a room with the name of the socket and joining that socket to the room
+      //socket.join(user_name);//defining a room with the name of the socket and joining that socket to the room
       //checks if a user already exists and inserts in db if not
       autenticateUser(user_name, password, (authentication) => {
          if (authentication) {
@@ -39,7 +39,8 @@ io.sockets.on('connection', (socket) => {
             //sends the last 10 public msgs to a user that just entered
             Message.getPublic((lastMessages) => {
                //emits a private event to tell the client the result of the authentication   
-               io.to(user_name).emit('auth', { message: 'sucess', lastMessages,user_name });
+              // io.to(user_name).emit('auth', { message: 'sucess', lastMessages,user_name });
+               io.sockets.connected[socket.id].emit('auth', { message: 'sucess', lastMessages,user_name });
             });
 
             //created a message for all to see that there are new users in the chat
@@ -47,7 +48,8 @@ io.sockets.on('connection', (socket) => {
             io.emit('update', { message, connections});
          }
          else {
-            io.to(user_name).emit('auth', { message: 'fail' });
+            io.sockets.connected[socket.id].emit('auth', { message: 'fail' });
+            //io.to(user_name).emit('auth', { message: 'fail' });
          }
       });
    });
@@ -58,12 +60,14 @@ io.sockets.on('connection', (socket) => {
       { 
          Message.getPublic((lastMessages) => {
             //emits a private event to tell the client the result of the authentication   
-            io.to(user_name).emit('last public messages', { message: 'sucess', lastMessages });
+            //io.to(user_name).emit('last public messages', { message: 'sucess', lastMessages });
+            io.sockets.connected[socket.id].emit('last public messages', { message: 'sucess', lastMessages });
          });
       }else{
          //sends the last messages between the requester and his target
          Message.getPrivate(data.target,user_name,(lastMessages)=>{
-            io.to(user_name).emit('last public messages', { message: 'sucess', lastMessages });
+            //io.to(user_name).emit('last public messages', { message: 'sucess', lastMessages });
+            io.sockets.connected[socket.id].emit('last public messages', { message: 'sucess', lastMessages });
          })
       }
       
