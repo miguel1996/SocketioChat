@@ -97,8 +97,12 @@ function autenticateUser(user_name, password, callback) {
    User.exists(user_name, (result) => {
       //se nao existe entao adiciona
       if (!result) {
+         if(user_name === ''){
+            callback(false);
+         }else{
          addUserIfNotExists(user_name, password);
          callback(true);//true means that the authentications ended sucessfully(this means that a user has logged on)
+         }
       }
       //se ja existe um user na bd entao verifica a pass
       else {

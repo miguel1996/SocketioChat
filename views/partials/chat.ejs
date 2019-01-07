@@ -1,15 +1,20 @@
+
+
 <div class="row" style="margin-top: 70px;" id="chat">
     <div class="col-md-4"><div id="users"></div></div>
     <div class="col-md-6">
-       <div id="chatArea">
+       <div id="chatArea" style="height: 400px; overflow-y: auto;">
        </div>
        <form id="myForm">
           <input type='hidden' id='chatTarget' value="general">
           <div class="form-group">
-             <input type=text id="txt" class="form-control">
+            <input type=text id="txt" class="form-control footer" style="float: left; width:85%">
+            <button type="submit" style="float:right" id="send_message_button" class="btn btn-success">Send</button>
+            
           </div>
           <div class="form-group">
-             <button type="submit" class="btn btn-success" id="send_message_button">Send</button>
+            
+             <!-- <button type="submit" class="btn btn-success" id="send_message_button">Send</button> -->
           </div>
        </form>
     </div>
