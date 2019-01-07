@@ -62,7 +62,7 @@
             if (data.message === 'sucess') {
                 $("#chat").css('display', 'block');
                 $("#login_form").css('display', 'none');
-                $("#main_header").append(data.user_name);
+                $("#main_header").html("Welcome home, " + data.user_name + "!");
                 insertLastMessages(data.lastMessages);
             } else {
                 // alert(data.message);
