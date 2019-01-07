@@ -2,10 +2,10 @@
 
     <form id="loginForm">    
         <div class="form-group">
-            Username: <input id="user_name" type="text">
+            <span>Username</span> <br><input id="user_name" type="text">
         </div>
         <div class="form-group">
-            Password: <input id="password" type="password">
+            <span>Password</span> <br><input id="password" type="password">
         </div>
         <span style="color:red; display: none;" v-if="test !== 'sucess'" id="failed-login">
             {{msg}}<br>

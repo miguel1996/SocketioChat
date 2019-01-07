@@ -6,7 +6,7 @@
     var socket;
     
     jQuery(document).ready(function () {
-       
+
         //in the beggining the chat is hidden and a login prompt is shown
         $("#chat").css('display', 'none');
         $("#login_form").css('display', 'block');
@@ -134,12 +134,12 @@
         var conns = data.connections;
         usersArea.html('');
         //font weight ta mal
-        usersArea.append('<div class="well" value="general" id="general">General chat</div>');
+        usersArea.append('<div class="well chat" value="general" id="general">General chat</div>');
         
         for (var key in conns) {
             color = getHashColor(conns[key]);
             // console.log(complement);
-            usersArea.append('<div class="well" style="background-color:#'+color+';" value="'+conns[key]+'" id="'+conns[key]+'">' + conns[key] + '</div>');
+            usersArea.append('<div class="well chat" style="background-color:#'+color+';" value="'+conns[key]+'" id="'+conns[key]+'">'+conns[key] + '</div>');
             
 
         }
@@ -165,8 +165,7 @@
         let seconds = date.getSeconds()+'s';
         let dateFormatted = hour + minutes + seconds;
         var color = getHashColor(user);
-        console.log(user+' '+color);
-        $('#chatArea').append('<div class="well" style="background-color:#'+color+'">' + dateFormatted + ' ' + user + ': ' + message + '</div>');
+        $('#chatArea').append('<div class="well" style="background-color:#'+color+'">' + '<span class="user">'+ dateFormatted + ' <span class="highlight">' +user + '</span>: ' + message + '</span></div>');
     }
 
     function clearChatArea(){
@@ -177,7 +176,7 @@
         //  
         $("#chatArea").scrollTop($("#chatArea").prop("scrollHeight"));
         // console.log($('#chatArea').prop('scrollHeight'));
-        }
+    }
 
     
 

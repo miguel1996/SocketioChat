@@ -1,3 +1,26 @@
-body{
-	/*background-color: black;*/
+#main_header, #loginForm{
+	text-align: center;
+}
+
+/*{
+	font-size: 15pt;
+}*/
+
+#loginForm input, #loginForm button, #loginForm span{
+	width: 30%;
+	font-size: 15pt;
+}
+
+.chat{
+	cursor: pointer;
+}
+
+.chat:hover, .highlight{
+	text-decoration: underline;
+}
+
+.user{
+	background-color: white;
+	padding: 3px;
+	opacity: 0.6;
 }
