@@ -159,7 +159,9 @@
         let minutes = date.getMinutes()+'m';
         let seconds = date.getSeconds()+'s';
         let dateFormatted = hour + minutes + seconds;
-        $('#chatArea').append('<div class="well">' + dateFormatted + ' ' + user + ': ' + message + '</div>');
+        var color = getHashColor(user);
+        console.log(user+' '+color);
+        $('#chatArea').append('<div class="well" style="background-color:#'+color+'">' + dateFormatted + ' ' + user + ': ' + message + '</div>');
     }
 
     function clearChatArea(){
